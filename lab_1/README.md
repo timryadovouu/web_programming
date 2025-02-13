@@ -1,4 +1,4 @@
-## Web Programming - 5 term - lab 1
+## Lab 1
 
 ### TL;DR
 
