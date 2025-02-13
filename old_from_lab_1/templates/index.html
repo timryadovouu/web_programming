@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebSocket Chat</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+      .message {
+        margin: 5px;
+        background: #f9f9f9;
+        padding: 10px;
+        border-radius: 5px;
+        width: fit-content;
+        max-width: 70%;
+      }
+      .system-message {
+        color: #888;
+        font-style: italic;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>WebSocket Chat</h1>
+    <div>
+      <label for="room">Room:</label>
+      <input type="text" id="room" placeholder="Enter room name" />
+      <button id="joinRoom">Join Room</button>
+    </div>
+    <ul id="messages"></ul>
+    <form id="form" style="display: none">
+      <input
+        type="text"
+        id="messageText"
+        autocomplete="off"
+        placeholder="Type a message..."
+      />
+      <button>Send</button>
+    </form>
+
+    <script>
+      let ws;
+      const form = document.getElementById("form");
+      const input = document.getElementById("messageText");
+      const messages = document.getElementById("messages");
+      const joinRoomButton = document.getElementById("joinRoom");
+      const roomInput = document.getElementById("room");
+
+      joinRoomButton.onclick = function () {
+        const roomName = roomInput.value.trim();
+        if (!roomName) {
+          alert("Please enter a room name.");
+          return;
+        }
+
+        if (ws) {
+          ws.close();
+        }
+
+        // Simulate a JWT token (replace this with a real token in production)
+        const fakeToken = "Bearer your-fake-jwt-token";
+
+        ws = new WebSocket(`ws://localhost:8000/ws/${roomName}`);
+        ws.onopen = function () {
+          console.log(`Connected to room: ${roomName}`);
+          form.style.display = "block";
+          const systemMessage = document.createElement("div");
+          systemMessage.textContent = `Connected to room: ${roomName}`;
+          systemMessage.classList.add("system-message");
+          messages.appendChild(systemMessage);
+        };
+
+        ws.onmessage = function (event) {
+          const messageItem = document.createElement("div");
+          messageItem.textContent = event.data;
+          messageItem.classList.add("message");
+          messages.appendChild(messageItem);
+          messages.scrollTop = messages.scrollHeight;
+        };
+
+        ws.onclose = function () {
+          const systemMessage = document.createElement("div");
+          systemMessage.textContent = "Disconnected from the room.";
+          systemMessage.classList.add("system-message");
+          messages.appendChild(systemMessage);
+          form.style.display = "none";
+        };
+
+        ws.onerror = function (error) {
+          console.error("WebSocket error:", error);
+        };
+      };
+
+      form.onsubmit = function (event) {
+        event.preventDefault();
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(input.value);
+          input.value = "";
+        }
+      };
+    </script>
+  </body>
+</html>

@@ -1,0 +1,5 @@
+.env
+.git
+.venv_lab1
+**/__pycache__
+.DS_Store

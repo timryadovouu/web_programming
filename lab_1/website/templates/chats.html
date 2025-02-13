@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chats</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="icon" href="/static/icons/chatIcon.ico" type="image/x-icon" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Welcome, <span id="user-email">Loading...</span>!</h1>
+      <hr />
+      <h1>Chats</h1>
+      <div id="chats">
+        <!-- Список чатов будет здесь -->
+      </div>
+      <button id="createRoom">Create New Room</button>
+      <hr />
+      <h1>Search</h1>
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="enter at least 6 letters"
+      />
+      <button onclick="searchChats()">Search</button>
+
+      <div id="searchResults">
+        <!-- Результаты поиска будут отображаться здесь -->
+      </div>
+      <hr />
+      <a href="/home" class="green-button">Home page</a>
+      <button onclick="logout()" class="red-button">Logout</button>
+    </div>
+
+    <script>
+      const token = localStorage.getItem("access_token");
+      // ================ check token ================
+      if (!token) {
+        // Если токена нет, перенаправляем на страницу входа
+        alert("you have to login!");
+        window.location.href = "/login";
+      }
+      // ================ get user-email ================
+      if (token) {
+        fetch("/me", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`, // Передаём токен в заголовке
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Failed to fetch user data");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            document.getElementById("user-email").textContent = data.user.email;
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            document.getElementById("user-email").textContent = "Guest";
+          });
+      } else {
+        document.getElementById("user-email").textContent = "Guest";
+      }
+
+      // ================ load chats ================
+      async function loadChats() {
+        const response = await fetch("/chats/", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          const chats = await response.json();
+          const chatsContainer = document.getElementById("chats");
+          chats.forEach((chat) => {
+            const chatElement = document.createElement("div");
+            chatElement.innerHTML = `
+              <button onclick="joinChat(${chat.id})">Join room ${chat.name} (owner: ${chat.owner.email})</button>
+            `;
+            chatsContainer.appendChild(chatElement);
+          });
+        } else {
+          const error = await response.json();
+          alert("Failed: " + error.detail);
+          window.location.href = "/home";
+        }
+      }
+
+      // ================ join room ================
+      function joinChat(roomId) {
+        window.location.href = `/chat/${roomId}`;
+      }
+
+      // ================ logout ================
+      function logout() {
+        localStorage.removeItem("access_token");
+        alert("Redirecting to home page");
+        window.location.href = "/home";
+      }
+
+      // ================ create room ================
+      document
+        .getElementById("createRoom")
+        .addEventListener("click", async () => {
+          const roomName = prompt("Enter room name:");
+          if (roomName) {
+            const response = await fetch("/chats/create", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({ name: roomName }),
+            });
+
+            if (response.ok) {
+              alert("Room created successfully!");
+              window.location.reload();
+            } else {
+              const error = await response.json();
+              alert("failed: " + error.detail);
+            }
+          }
+        });
+
+      loadChats();
+
+      // ================ rooms search ================
+      async function searchChats() {
+        const query = document.getElementById("searchInput").value;
+        const searchResults = document.getElementById("searchResults");
+        searchResults.innerHTML = ""; // Очищаем результаты поиска
+
+        if (query.length < 6) {
+          alert("enter at least 6 letters!");
+          return;
+        }
+
+        const loadingMessage = document.createElement("p");
+        loadingMessage.textContent = "Searching...";
+        searchResults.appendChild(loadingMessage);
+
+        const response = await fetch(
+          `/search?query=${encodeURIComponent(query)}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        searchResults.innerHTML = "";
+
+        if (response.ok) {
+          const chats = await response.json();
+          chats.forEach((chat) => {
+            const chatElement = document.createElement("div");
+            // chatElement.classList.add("chat-result");
+            chatElement.innerHTML = `<button onclick="joinChat(${chat.id})">${chat.name} owner: ${chat.owner.email}</button>`;
+            searchResults.appendChild(chatElement);
+          });
+        } else {
+          searchResults.innerHTML = "<p>No chats found!</p>";
+        }
+      }
+    </script>
+  </body>
+</html>

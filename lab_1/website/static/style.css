@@ -1,0 +1,204 @@
+/* ===================================== MAIN ===================================== */
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #29cfae;
+  font-family: Arial, sans-serif;
+  margin: 0;
+}
+
+.container {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 400px;
+  padding-top: 15px;
+}
+
+h1 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+form {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  text-align: left;
+  margin-bottom: 5px;
+  color: #555;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ===================================== BUTTONS ===================================== */
+button {
+  width: 100%;
+  padding: 12px;
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.green-button {
+  display: inline-block;
+  padding: 12px;
+  background-color: #28a745;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 100px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  line-height: 16px;
+}
+
+.green-button:hover {
+  background-color: #218838;
+  text-decoration: none;
+}
+
+.red-button {
+  display: inline-block;
+  padding: 12px;
+  background-color: #c44620;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  text-align: center;
+  width: 100px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  line-height: 16px;
+}
+
+.red-button:hover {
+  background-color: #ff5900;
+  text-decoration: none;
+}
+
+.blue-button {
+  display: inline-block;
+  padding: 12px;
+  background-color: #5759bb;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  text-align: center;
+  width: 100px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  line-height: 16px;
+}
+
+.blue-button:hover {
+  background-color: #6980dd;
+  text-decoration: none;
+}
+
+/* ===================================== SEARCH ===================================== */
+
+.chat-result {
+  border: 1px solid #ccc;
+  padding: 5px;
+  margin: 5px 0;
+  border-radius: 5px;
+}
+/* ===================================== MESSAGES ===================================== */
+
+#messages {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 10px;
+  width: 90%;
+  max-width: 600px;
+  height: 300px;
+  overflow-y: auto;
+  background-color: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto 15px auto;
+}
+
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.message {
+  padding: 10px;
+  border-radius: 15px;
+  margin: 7px 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 60%;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: left; /* to left */
+}
+
+.notification {
+  width: 100%;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  margin: 10px 0;
+}
+
+.you {
+  background-color: #cce5ff;
+  text-align: right;
+  align-self: flex-end; /*to right*/
+}
+
+.other {
+  background-color: #e2e3e5;
+  text-align: left;
+  align-self: flex-start; /*to left*/
+}
