@@ -1,6 +1,6 @@
 import React from "react";
 
-const StudentTable = ({ students, onDelete }) => {
+const StudentTable = ({ students, onDelete, onEdit }) => {
   return (
     <table className="table-auto w-full border-collapse border border-gray-300">
       <thead>
@@ -28,9 +28,15 @@ const StudentTable = ({ students, onDelete }) => {
             <td className="border p-2">
               <button
                 onClick={() => onDelete(student.id)}
-                className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 mr-2"
               >
-                Удалить
+                Delete
+              </button>
+              <button
+                onClick={() => onEdit(student)}
+                className="px-2 py-1 bg-orange-500 text-white rounded hover:bg-orange-600"
+              >
+                Edit
               </button>
             </td>
           </tr>

@@ -7,30 +7,74 @@ const Pagination = ({ page, setPage, totalPages, pageSize, setPageSize }) => {
     setPage(1);
   };
 
+  const generatePageNumbers = () => {
+    const pages = [];
+    const maxPagesToShow = 5;
+    const halfWay = Math.floor(maxPagesToShow / 2);
+
+    if (totalPages <= maxPagesToShow) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (page <= halfWay + 1) {
+        for (let i = 1; i <= maxPagesToShow; i++) {
+          pages.push(i);
+        }
+        pages.push("...");
+        pages.push(totalPages);
+      } else if (page >= totalPages - halfWay) {
+        pages.push(1);
+        pages.push("...");
+        for (let i = totalPages - maxPagesToShow + 1; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        pages.push(1);
+        pages.push("...");
+        for (let i = page - 1; i <= page + 1; i++) {
+          pages.push(i);
+        }
+        pages.push("...");
+        pages.push(totalPages);
+      }
+    }
+    return pages;
+  };
+
   return (
     <div className="flex items-center justify-between mt-4">
-      <div>
+      <div className="flex items-center space-x-2">
         <button
           onClick={() => setPage(page - 1)}
           disabled={page === 1}
-          className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300"
+          className="px-3 py-2 border rounded disabled:opacity-50"
         >
-          Назад
+          &lt;
         </button>
-        <span className="mx-4">
-          Страница {page} из {totalPages}
-        </span>
+        {generatePageNumbers().map((p, index) => (
+          <button
+            key={index}
+            onClick={() => typeof p === "number" && setPage(p)}
+            className={`px-3 py-2 border rounded ${
+              p === page ? "bg-blue-500 text-white" : ""
+            }`}
+            disabled={p === "..."}
+          >
+            {p}
+          </button>
+        ))}
         <button
           onClick={() => setPage(page + 1)}
           disabled={page === totalPages}
-          className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300"
+          className="px-3 py-2 border rounded disabled:opacity-50"
         >
-          Вперед
+          &gt;
         </button>
       </div>
       <div>
         <label htmlFor="pageSize" className="mr-2">
-          Записей на странице:
+          Records on page:
         </label>
         <select
           id="pageSize"

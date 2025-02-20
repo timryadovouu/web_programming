@@ -14,8 +14,6 @@ from schemas import StudentResponse, StudentCreateOrUpdate, StudentsResponse
 
 # create app
 app = FastAPI()
-# app.mount("/static", StaticFiles(directory="static"), name="static")
-# templates = Jinja2Templates(directory="templates")
 
 # create database tables
 Base.metadata.create_all(bind=engine)
@@ -26,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Разрешить запросы отовсюду (можно сузить)
+    allow_origins=["*"],  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -40,18 +38,20 @@ def read_students(
     skip: int = Query(0, description="Number of records to skip"),
     limit: int = Query(None, description="Maximum number of records to return")):
 
-    students = db.query(Student).offset(skip).limit(limit).all()
+    students = db.query(Student).order_by(Student.id).offset(skip).limit(limit).all()
     total_count = db.query(Student).count()
 
     return {"students": students, "totalCount": total_count}
 
 @app.post("/student/create")
 def create_student(student: StudentCreateOrUpdate, db: Session = Depends(get_db)):
+    middle_name = student.middle_name if student.middle_name else None  # None or str
+    logger.info(f"middle_name: {middle_name}")
     # check if student already exists
     db_student = db.query(Student).filter(
         Student.last_name == student.last_name,
         Student.first_name == student.first_name,
-        Student.middle_name == student.middle_name, 
+        Student.middle_name == middle_name, 
         Student.course == student.course,
         Student.group_name == student.group_name,
         Student.faculty == student.faculty
@@ -98,10 +98,17 @@ def update_student(student_id: int, student_update: StudentCreateOrUpdate, db: S
     return {"message": f"Student (ID: {student_id}) updated"}
 
 
-@app.get("/search", response_model=List[StudentResponse])
-def search_students(request: Request, db: Session = Depends(get_db)):
+@app.get("/students/search", response_model=StudentsResponse)
+def search_students(
+    request: Request,
+    db: Session = Depends(get_db)
+    ):
+
     filters = []
+    logger.info(f"parameters: {request.query_params.items()}")
     for field, value in request.query_params.items():
+        if field in ["skip", "limit"]:
+            continue
         if field == "middle_name":
             if value == "null":
                 filters.append(Student.middle_name.is_(None))
@@ -119,12 +126,21 @@ def search_students(request: Request, db: Session = Depends(get_db)):
                 filters.append(column.ilike(f"%{value}%"))
         else:
             raise HTTPException(status_code=400, detail=f"Invalid search field: {field}")
-
+        
+    totalCount = db.query(Student).filter(*filters).count() if filters else db.query(Student).count()
+    skip = int(request.query_params.get('skip', 0))
+    limit = int(request.query_params.get('limit', totalCount))
+    
+    
     if filters:
-        students = db.query(Student).filter(*filters).all() 
+        # students = db.query(Student).filter(*filters).all() 
+        students = db.query(Student).order_by(Student.id).filter(*filters).offset(skip).limit(limit).all()
     else:
-        students = []
+        # students = []
+        students = db.query(Student).order_by(Student.id).offset(skip).limit(limit).all()
 
     if not students:
         raise HTTPException(status_code=404, detail="No students found")
-    return students
+    
+    # return students
+    return {"students": students, "totalCount": totalCount}

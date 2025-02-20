@@ -43,16 +43,5 @@ services:
     depends_on:
       - db
 
-  # nginx:
-  #   image: nginx:latest
-  #   container_name: nginx_server
-  #   ports:
-  #     - "80:80"
-  #   volumes:
-  #     - ./nginx:/etc/nginx/conf.d
-  #     - ./frontend/build:/usr/share/nginx/html
-  #   depends_on:
-  #     - api
-
 volumes:
   db_data:
