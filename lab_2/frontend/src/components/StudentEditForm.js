@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 
 const StudentEditForm = ({ student, onUpdate, onCancel }) => {
   const [formData, setFormData] = useState({
