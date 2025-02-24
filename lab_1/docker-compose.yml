@@ -22,8 +22,8 @@ services:
   website:
     build: ./website
     container_name: website_server
-    volumes:
-      - ./website:/website
+    # volumes:
+    #   - ./website:/website
     environment:
       SERVER_NAME: WEBSITE-1
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
@@ -34,8 +34,8 @@ services:
   chat:
     build: ./chat
     container_name: chat_server
-    volumes:
-      - ./chat:/chat
+    # volumes:
+    #   - ./chat:/chat
     ports:
       - "8001:8001"
     depends_on:
